@@ -13,8 +13,28 @@
 ckanext-envvars
 ===============
 
-This CKAN extension checks for environmental variables that conform to a
-specific format and sets the corresponding CKAN config settings to its value.
+This CKAN extension checks for environmental variables conforming to an
+expected format and updates the corresponding CKAN config settings with its
+value.
+
+For the extension to correctly identify which env var keys map to the format
+used for the config object, env var keys should be formatted in the following
+way:
+
+1) All uppercase
+2) Replace periods ('.') with two underscores ('__')
+3) Keys must begin with 'CKAN' or 'CKANEXT'
+
+Some examples::
+
+    ckan.site_id --> CKAN__SITE_ID
+    ckanext.s3filestore.aws_bucket_name --> CKANEXT__S3FILESTORE__AWS_BUCKET_NAME
+
+For keys that don't normally begin with 'CKAN', add 'CKAN___' (3 underscores)
+to the beginning to help the extension identify these keys, e.g.::
+
+    sqlalchemy.url --> CKAN___SQLALCHEMY__URL
+    beaker.session.secret --> CKAN___BEAKER__SESSION__SECRET
 
 
 ------------
@@ -51,17 +71,6 @@ To install ckanext-envvars:
 4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
      sudo service apache2 reload
-
-
----------------
-Config Settings
----------------
-
-Document any optional config settings here. For example::
-
-    # The minimum number of hours to wait before re-checking a resource
-    # (optional, default: 24).
-    ckanext.envvars.some_setting = some_default_value
 
 
 ------------------------
