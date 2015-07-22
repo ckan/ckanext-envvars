@@ -1,7 +1,10 @@
 import os
 from nose.tools import assert_equal
+from nose.plugins.skip import SkipTest
 
 from pylons import config
+import ckan
+import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 
 from ckanext.envvars.plugin import EnvvarsPlugin
@@ -89,6 +92,9 @@ class TestCkanCoreEnvVarsConfig(object):
 
     def test_core_ckan_envvar_values_in_config(self):
 
+        if not toolkit.check_ckan_version('2.4.0'):
+            raise SkipTest('CKAN version 2.4 or above needed')
+
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
             ('CKAN_DATASTORE_WRITE_URL', 'http://mynewdbwriteurl/'),
@@ -121,6 +127,10 @@ class TestCkanCoreEnvVarsConfig(object):
     def test_core_ckan_envvar_values_in_config_take_precedence(self):
         '''Core CKAN env var transformations take precedence over this
         extension'''
+
+        if not toolkit.check_ckan_version('2.4.0'):
+            raise SkipTest('CKAN version 2.4 or above needed')
+
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),
             ('CKAN_SQLALCHEMY_URL', 'postgresql://coreckanformat/'),

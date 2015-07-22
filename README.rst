@@ -41,7 +41,7 @@ to the beginning to help the extension identify these keys, e.g.::
 Requirements
 ------------
 
-Requires CKAN 2.4.0
+Tested in CKAN 2.3 and 2.4.0, but may work in previous versions.
 
 To ensure all config settings are overridden by env var values, ``envvars``
 must be the last plugin entry in the ``ckan.plugins`` list (see 'Installation'
