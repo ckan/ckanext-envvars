@@ -50,36 +50,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependency (common)
+    - name: Install requirements (py2/py3)
       run: |
-        apk add geos-dev
-    - name: Install requirements (py3)
-      if: ${{ matrix.ckan-version == '2.9' }}
-      run: |
-        apk add proj proj-util proj-dev
-        pip install -r requirements.txt
-        pip install -r dev-requirements.txt
         pip install -e .
-    - name: Install requirements (py2)
-      if: ${{ matrix.ckan-version == '2.8' }}
-      run: |
-        pip install -r requirements-py2.txt
-        pip install -r dev-requirements-py2.txt
-        pip install -e .
+        pip install pytest pycodestyle pytest-ckan pytest-cov
     - name: Setup extension (CKAN >= 2.9)
       if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
       run: |
         source $ENV_FILE
         ckan -c test.ini db init
-        ckan -c test.ini harvester initdb
-        ckan -c test.ini spatial initdb
     - name: Setup extension (CKAN < 2.9)
       if: ${{ matrix.ckan-version == '2.8' }}
       run: |
         source $ENV_FILE
         paster --plugin=ckan db init -c test.ini
-        paster --plugin=ckanext-harvest harvester initdb -c test.ini
-        paster --plugin=ckanext-spatial spatial initdb -c test.ini
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --cov=ckanext.geodatagov --cov-fail-under=${CODE_COVERAGE_THRESHOLD_REQUIRED} --disable-warnings ckanext/geodatagov/tests
+      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --disable-warnings /srv/app/src/ckanext-envvars/ckanext/envvars/tests_2_8_and_above.py
 
