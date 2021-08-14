@@ -37,4 +37,4 @@ while ! ckan_wrapper --plugin=ckan db init; do
 done
 
 # start_ckan_development.sh &
-pytest --ckan-ini=$TEST_CONFIG --cov=ckanext.datagovcatalog --disable-warnings /srv/app/src/ckanext-envvars/ckanext/envvars/tests_2_8_and_above.py
+pytest --ckan-ini=$TEST_CONFIG --cov=ckanext.envvars --disable-warnings /srv/app/src/ckanext-envvars/ckanext/envvars/tests_2_8_and_above.py
