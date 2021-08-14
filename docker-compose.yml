@@ -1,0 +1,52 @@
+---
+version: "3.7"
+services:
+  app:
+    image: openknowledge/ckan-dev:${CKAN_VERSION}
+    build:
+      context: .
+      args:
+        CKAN_VERSION: ${CKAN_VERSION}
+    env_file:
+      - .env
+    environment:
+      CKAN__PLUGINS: envvars
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - redis
+      - solr
+    volumes:
+      - ckan_storage:/var/lib/ckan
+      - ./config:/etc/ckan
+      - .:/srv/app/src/ckanext-envvars
+      
+  db:
+    image: ckan/ckan-postgres-dev:${CKAN_VERSION}
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "pg_isready -u postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+  solr:
+    image: datagov/catalog.data.gov.solr:latest
+    ports:
+      - "8983:8983"
+
+volumes:
+  ckan_storage:
+  pg_data:
+  solr_data:
