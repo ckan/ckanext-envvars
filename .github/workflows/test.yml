@@ -66,5 +66,4 @@ jobs:
         source $ENV_FILE
         paster --plugin=ckan db init -c test.ini
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --disable-warnings /ckanext/envvars/tests_2_8_and_above.py
-
+      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --disable-warnings ckanext/envvars/tests_2_8_and_above.py
