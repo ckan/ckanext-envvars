@@ -32,19 +32,20 @@ jobs:
       solr:
         image: datagov/catalog.data.gov.solr:latest
       db:
-        image: datagov/catalog.data.gov.db:latest
+        image: ckan/ckan-postgres-dev:${{ matrix.ckan-version }}
         env:
-          POSTGRES_USER: ckan
-          POSTGRES_PASSWORD: ckan
-          POSTGRES_DB: ckan
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 10
       redis:
           image: redis:alpine
     env:
       ENV_FILE: .env
-      CKAN_SQLALCHEMY_URL: postgresql://ckan:ckan@db/ckan
-      CKAN_DATASTORE_WRITE_URL: postgresql://ckan:ckan@db/datastore
-      CKAN_DATASTORE_READ_URL: postgresql://datastore_ro:datastore@db/datastore
+      CKAN__PLUGINS: envvars harvest ckan_harvester datagovcatalog
+      CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@db/ckan_test
+      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@db/datastore_test
+      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@db/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan
       CKAN_REDIS_URL: redis://redis:6379/1
 
