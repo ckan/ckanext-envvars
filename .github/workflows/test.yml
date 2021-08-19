@@ -1,7 +1,7 @@
 name: Tests
 on: [pull_request]
 env:
-  CODE_COVERAGE_THRESHOLD_REQUIRED: 33
+  CODE_COVERAGE_THRESHOLD_REQUIRED: 95
 jobs:
   lint:
     runs-on: ubuntu-latest
