@@ -2,11 +2,8 @@
    these badges work. The necessary Travis and Coverage config files have been
    generated for you.
 
-.. image:: https://travis-ci.org/okfn/ckanext-envvars.svg?branch=master
-    :target: https://travis-ci.org/okfn/ckanext-envvars
-
-.. image:: https://coveralls.io/repos/okfn/ckanext-envvars/badge.svg
-  :target: https://coveralls.io/r/okfn/ckanext-envvars
+.. image:: https://github.com/GSA/ckanext-geodatagov/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/GSA/ckanext-geodatagov/actions
 
 
 ===============
@@ -41,7 +38,8 @@ to the beginning to help the extension identify these keys, e.g.::
 Requirements
 ------------
 
-Tested in CKAN 2.3 and 2.4.0, but may work in previous versions.
+Parent Repo --> Tested in CKAN 2.3 and 2.4.0, but may work in previous versions.
+This fork   --> Tested in CKAN 2.8 and CKAN 2.9, but may work in other versions.
 
 To ensure all config settings are overridden by env var values, ``envvars``
 must be the last plugin entry in the ``ckan.plugins`` list (see 'Installation'
@@ -92,14 +90,59 @@ do::
 Running the Tests
 -----------------
 
-To run the tests, do::
+Using the Docker Dev Environment
+================================
 
-    nosetests --nologcapture --with-pylons=test.ini
+Build Environment
+-----------------
 
-To run the tests and produce a coverage report, first make sure you have
-coverage installed in your virtualenv (``pip install coverage``) then run::
+To start environment, run:
+```make build```
+```make up```
 
-    nosetests --nologcapture --with-pylons=test.ini --with-coverage --cover-package=ckanext.envvars --cover-inclusive --cover-erase --cover-tests
+CKAN will start at localhost:5000
+
+To shut down environment, run:
+
+  ```make clean```
+
+To docker exec into the CKAN image, run:
+
+  ```docker-compose exec app /bin/bash```
+
+Testing
+-------
+
+They follow the guidelines for [testing CKAN extensions](https://docs.ckan.org/en/2.8/extensions/testing-extensions.html#testing-extensions).
+
+To run the extension tests, start the containers with `make up`, then:
+
+    $ make test
+
+Lint the code.
+
+    $ make lint
+    
+Matrix builds
+-------------
+
+The existing development environment assumes a full catalog.data.gov test setup. This makes
+it difficult to develop and test against new versions of CKAN (or really any
+dependency) because everything is tightly coupled and would require us to
+upgrade everything at once which doesn't really work. A new make target
+`test-new` is introduced with a new docker-compose file.
+
+The "new" development environment drops as many dependencies as possible. It is
+not meant to have feature parity with
+[GSA/catalog.data.gov](https://github.com/GSA/catalog.data.gov/). Tests should
+mock external dependencies where possible.
+
+In order to support multiple versions of CKAN, or even upgrade to new versions
+of CKAN, we support development and testing through the `CKAN_VERSION`
+environment variable.
+
+    $ make CKAN_VERSION=2.8 test
+    $ make CKAN_VERSION=2.9 test
 
 
 -----------------------------------
