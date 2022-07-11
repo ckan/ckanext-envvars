@@ -54,7 +54,7 @@ jobs:
     - name: Install requirements (py2/py3)
       run: |
         pip install -e .
-        pip install pytest pycodestyle pytest-ckan pytest-cov
+        pip install -r dev-requirements.txt
     - name: Setup extension (CKAN >= 2.9)
       if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
       run: |
@@ -66,4 +66,4 @@ jobs:
         source $ENV_FILE
         paster --plugin=ckan db init -c test.ini
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --disable-warnings ckanext/envvars/tests_2_8_and_above.py
+      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --disable-warnings ckanext/envvars/tests.py
