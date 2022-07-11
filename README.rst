@@ -2,8 +2,8 @@
    these badges work. The necessary Travis and Coverage config files have been
    generated for you.
 
-.. image:: https://github.com/GSA/ckanext-envvars/actions/workflows/test.yml/badge.svg
-    :target: https://github.com/GSA/ckanext-envvars/actions
+.. image:: https://github.com/okfn/ckanext-envvars/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/okfn/ckanext-envvars/actions
 
 
 ===============
