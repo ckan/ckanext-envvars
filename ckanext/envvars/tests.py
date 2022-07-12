@@ -1,11 +1,10 @@
 import os
-from nose.tools import assert_equal
-from nose.plugins.skip import SkipTest
+import pytest
 
-from pylons import config
-import ckan
-import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
+
+from ckantoolkit import config
+import ckantoolkit as toolkit
 
 from ckanext.envvars.plugin import EnvvarsPlugin
 
@@ -31,14 +30,14 @@ class TestEnvVarToIni(object):
         ]
 
         for envkey, inikey in envvar_to_ini_examples:
-            assert_equal(EnvvarsPlugin._envvar_to_ini(envkey), inikey)
+            assert EnvvarsPlugin._envvar_to_ini(envkey) == inikey
 
 
 class TestEnvVarsConfig(object):
 
     def _setup_env_vars(self, envvar_list):
         for env_var, value in envvar_list:
-            os.environ.setdefault(env_var, value)
+            os.environ[env_var] = value
         # plugin.load() will force the config to update
         p.load()
 
@@ -60,12 +59,11 @@ class TestEnvVarsConfig(object):
 
         self._setup_env_vars(envvar_to_ini_examples)
 
-        assert_equal(config['ckan.site_id'], 'my-envvar-site')
-        assert_equal(config['ckanext.extension_setting'], 'my-extension-value')
-        assert_equal(config['ckanext.another.ext_setting'],
-                     'my-other-extension-value')
-        assert_equal(config['beaker.session.key'], 'my-beaker-key')
-        assert_equal(config['cache_dir'], '/cache_directory_path/')
+        assert config['ckan.site_id'] == 'my-envvar-site'
+        assert config['ckanext.extension_setting'] == 'my-extension-value'
+        assert config['ckanext.another.ext_setting'] == 'my-other-extension-value'
+        assert config['beaker.session.key'] == 'my-beaker-key'
+        assert config['cache_dir'] == '/cache_directory_path/'
 
         self._teardown_env_vars(envvar_to_ini_examples)
 
@@ -79,7 +77,7 @@ class TestCkanCoreEnvVarsConfig(object):
 
     def _setup_env_vars(self, envvar_list):
         for env_var, value in envvar_list:
-            os.environ.setdefault(env_var, value)
+            os.environ[env_var] = value
         # plugin.load() will force the config to update
         p.load()
 
@@ -93,7 +91,7 @@ class TestCkanCoreEnvVarsConfig(object):
     def test_core_ckan_envvar_values_in_config(self):
 
         if not toolkit.check_ckan_version('2.4.0'):
-            raise SkipTest('CKAN version 2.4 or above needed')
+            raise pytest.skip('CKAN version 2.4 or above needed')
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
@@ -110,17 +108,15 @@ class TestCkanCoreEnvVarsConfig(object):
 
         self._setup_env_vars(core_ckan_env_var_list)
 
-        assert_equal(config['sqlalchemy.url'], 'postgresql://mynewsqlurl/')
-        assert_equal(config['ckan.datastore.write_url'],
-                     'http://mynewdbwriteurl/')
-        assert_equal(config['ckan.datastore.read_url'],
-                     'http://mynewdbreadurl/')
-        assert_equal(config['ckan.site_id'], 'my-site')
-        assert_equal(config['smtp.server'], 'mail.example.com')
-        assert_equal(config['smtp.starttls'], 'True')
-        assert_equal(config['smtp.user'], 'my_user')
-        assert_equal(config['smtp.password'], 'password')
-        assert_equal(config['smtp.mail_from'], 'server@example.com')
+        assert config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
+        assert config['ckan.datastore.write_url'] == 'http://mynewdbwriteurl/'
+        assert config['ckan.datastore.read_url'] == 'http://mynewdbreadurl/'
+        assert config['ckan.site_id'] == 'my-site'
+        assert config['smtp.server'] == 'mail.example.com'
+        assert config['smtp.starttls'] == 'True'
+        assert config['smtp.user'] == 'my_user'
+        assert config['smtp.password'] == 'password'
+        assert config['smtp.mail_from'] == 'server@example.com'
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
@@ -129,7 +125,7 @@ class TestCkanCoreEnvVarsConfig(object):
         extension'''
 
         if not toolkit.check_ckan_version('2.4.0'):
-            raise SkipTest('CKAN version 2.4 or above needed')
+            raise pytest.skip('CKAN version 2.4 or above needed')
 
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),
@@ -138,6 +134,6 @@ class TestCkanCoreEnvVarsConfig(object):
 
         self._setup_env_vars(combined_list)
 
-        assert_equal(config['sqlalchemy.url'], 'postgresql://coreckanformat/')
+        assert config['sqlalchemy.url'] == 'postgresql://coreckanformat/'
 
         self._teardown_env_vars(combined_list)
