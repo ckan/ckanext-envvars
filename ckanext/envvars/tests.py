@@ -1,10 +1,10 @@
 import os
 import pytest
 
-import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 
 from ckantoolkit import config
+import ckantoolkit as toolkit
 
 from ckanext.envvars.plugin import EnvvarsPlugin
 
