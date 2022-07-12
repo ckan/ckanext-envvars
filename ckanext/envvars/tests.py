@@ -4,12 +4,7 @@ import pytest
 import ckan.plugins.toolkit as toolkit
 import ckan.plugins as p
 
-try:
-    p.toolkit.requires_ckan_version("2.8")
-except p.toolkit.CkanVersionException:
-    from pylons import config
-else:
-    from ckan.common import config
+from ckantoolkit import config
 
 from ckanext.envvars.plugin import EnvvarsPlugin
 
