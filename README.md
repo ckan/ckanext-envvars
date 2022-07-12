@@ -78,7 +78,7 @@ They follow the guidelines for [testing CKAN extensions](https://docs.ckan.org/e
 
 To run the tests, do:
 
-> pytest \--ckan-ini=test.ini ckanext/dcat/tests
+> pytest --ckan-ini=test.ini ckanext/envvars/tests.py
 
 Registering ckanext-envvars on PyPI
 -----------------------------------
