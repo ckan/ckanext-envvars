@@ -1,8 +1,12 @@
 import os
 import pytest
 
-import ckan.plugins as p
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
+import ckan.plugins as p
 from ckantoolkit import config
 import ckantoolkit as toolkit
 
@@ -88,7 +92,8 @@ class TestCkanCoreEnvVarsConfig(object):
         # plugin.load() will force the config to update
         p.load()
 
-    def test_core_ckan_envvar_values_in_config(self):
+    @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
+    def test_core_ckan_envvar_values_in_config(self, datastore_configure):
 
         if not toolkit.check_ckan_version('2.4.0'):
             raise pytest.skip('CKAN version 2.4 or above needed')
@@ -103,7 +108,8 @@ class TestCkanCoreEnvVarsConfig(object):
             ('CKAN_SMTP_STARTTLS', 'True'),
             ('CKAN_SMTP_USER', 'my_user'),
             ('CKAN_SMTP_PASSWORD', 'password'),
-            ('CKAN_SMTP_MAIL_FROM', 'server@example.com')
+            ('CKAN_SMTP_MAIL_FROM', 'server@example.com'),
+            ('CKAN__.DATASETS_PER_PAGE', '14'),
         ]
 
         self._setup_env_vars(core_ckan_env_var_list)
@@ -117,9 +123,15 @@ class TestCkanCoreEnvVarsConfig(object):
         assert config['smtp.user'] == 'my_user'
         assert config['smtp.password'] == 'password'
         assert config['smtp.mail_from'] == 'server@example.com'
+        # I'll expect CKAN 2.10 to transform this to an int
+        if toolkit.check_ckan_version(min_version='2.10'):
+            assert config['ckan.datasets_per_page'] == 14
+        else:
+            assert config['ckan.datasets_per_page'] == '14'
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
+    @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
     def test_core_ckan_envvar_values_in_config_take_precedence(self):
         '''Core CKAN env var transformations take precedence over this
         extension'''
