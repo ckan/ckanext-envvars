@@ -30,7 +30,7 @@ e.g.:
 Requirements
 ------------
 
-Tested in CKAN 2.7, CKAN 2.8 and CKAN 2.9, but may work in other
+Tested in CKAN 2.7, CKAN 2.8, CKAN 2.9 and CKAN 2.10, but may work in other
 versions.
 
 To ensure all config settings are overridden by env var values,

@@ -42,6 +42,8 @@ jobs:
       CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan
       CKAN_REDIS_URL: redis://redis:6379/1
+      # required for CKAN 2.10
+      CKAN__DATAPUSHER__API_TOKEN: XX
 
     steps:
     - uses: actions/checkout@v3
@@ -60,7 +62,7 @@ jobs:
       run: |
         paster --plugin=ckan db init -c test.ini
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --cov=ckanext.envvars --cov-report=xml --cov-append --disable-warnings ckanext/envvars/tests.py
+      run: pytest -vv --ckan-ini=test.ini --cov=ckanext.envvars --cov-report=xml --cov-append --disable-warnings ckanext/envvars/tests.py
     - name: Upload coverage report to codecov
       uses: codecov/codecov-action@v1
       with:
