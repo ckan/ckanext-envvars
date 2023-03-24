@@ -1,8 +1,9 @@
-import os
-
-import ckan.plugins as plugins
-
 import logging
+import os
+import ckan.plugins as plugins
+import ckantoolkit as toolkit
+
+
 log = logging.getLogger(__name__)
 
 
@@ -35,3 +36,8 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
 
         # override config settings with new values
         config.update(dict(ckan_vars))
+
+        # CKAN 2.10 should normalize config
+        if toolkit.check_ckan_version(min_version='2.10'):
+            from ckan.common import config_declaration
+            config_declaration.normalize(config)
