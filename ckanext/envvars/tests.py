@@ -95,8 +95,8 @@ class TestCkanCoreEnvVarsConfig(object):
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
-            ('CKAN_DATASTORE_WRITE_URL', 'http://mynewdbwriteurl/'),
-            ('CKAN_DATASTORE_READ_URL', 'http://mynewdbreadurl/'),
+            ('CKAN_DATASTORE_WRITE_URL', 'postgresql://mynewdbwriteurl/'),
+            ('CKAN_DATASTORE_READ_URL', 'postgresql://mynewdbreadurl/'),
             ('CKAN_SITE_ID', 'my-site'),
             ('CKAN_DB', 'postgresql://mydeprectatesqlurl/'),
             ('CKAN_SMTP_SERVER', 'mail.example.com'),
@@ -109,8 +109,8 @@ class TestCkanCoreEnvVarsConfig(object):
         self._setup_env_vars(core_ckan_env_var_list)
 
         assert config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
-        assert config['ckan.datastore.write_url'] == 'http://mynewdbwriteurl/'
-        assert config['ckan.datastore.read_url'] == 'http://mynewdbreadurl/'
+        assert config['ckan.datastore.write_url'] == 'postgresql://mynewdbwriteurl/'
+        assert config['ckan.datastore.read_url'] == 'postgresql://mynewdbreadurl/'
         assert config['ckan.site_id'] == 'my-site'
         assert config['smtp.server'] == 'mail.example.com'
         assert config['smtp.starttls'] == 'True'
