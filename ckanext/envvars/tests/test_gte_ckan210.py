@@ -49,7 +49,8 @@ class TestCkanCoreEnvVarsConfig(object):
             ('CKAN_SMTP_USER', 'my_user'),
             ('CKAN_SMTP_PASSWORD', 'password'),
             ('CKAN_SMTP_MAIL_FROM', 'server@example.com'),
-            ('CKAN__.DATASETS_PER_PAGE', '14'),
+            ('CKAN__DATASETS_PER_PAGE', '14'),
+            ('CKAN__HIDE_ACTIVITY_FROM_USERS', 'user1 user2'),
         ]
 
         self._setup_env_vars(core_ckan_env_var_list)
@@ -65,6 +66,7 @@ class TestCkanCoreEnvVarsConfig(object):
         assert config['smtp.mail_from'] == 'server@example.com'
         # I'll expect CKAN 2.10 to transform this to an int
         assert config['ckan.datasets_per_page'] == 14
+        assert config['ckan.hide_activity_from_users'] == ['user1',  'user2']
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
