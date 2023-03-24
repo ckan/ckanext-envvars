@@ -1,75 +1,15 @@
 import os
 import pytest
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 import ckan.plugins as p
 from ckantoolkit import config
 import ckantoolkit as toolkit
 
-from ckanext.envvars.plugin import EnvvarsPlugin
+
+if toolkit.check_ckan_version(max_version='2.9.99'):
+    pytest.skip("Skipping CKAN < 2.10", allow_module_level=True)
 
 
-class TestEnvVarToIni(object):
-
-    def test_envvartoini_expected_output(self):
-        '''
-        EnvvarsPlugin._envvar_to_ini returns expected transformation of env
-        var formated keys
-        '''
-
-        envvar_to_ini_examples = [
-            ('CKAN___CKAN__SITE_ID', 'ckan.site_id'),
-            ('CKAN__SITE_ID', 'ckan.site_id'),
-            ('CKAN___CKANEXT__EXTENSION_SETTING', 'ckanext.extension_setting'),
-            ('CKANEXT__EXTENSION_SETTING', 'ckanext.extension_setting'),
-            ('CKAN___BEAKER__SESSION__KEY', 'beaker.session.key'),
-            ('CKAN___CACHE_DIR', 'cache_dir'),
-            ('CKAN___CKAN__FEEDS__AUTHORITY_NAME',
-                'ckan.feeds.authority_name'),
-            ('CKAN__FEEDS__AUTHORITY_NAME', 'ckan.feeds.authority_name'),
-        ]
-
-        for envkey, inikey in envvar_to_ini_examples:
-            assert EnvvarsPlugin._envvar_to_ini(envkey) == inikey
-
-
-class TestEnvVarsConfig(object):
-
-    def _setup_env_vars(self, envvar_list):
-        for env_var, value in envvar_list:
-            os.environ[env_var] = value
-        # plugin.load() will force the config to update
-        p.load()
-
-    def _teardown_env_vars(self, envvar_list):
-        for env_var, _ in envvar_list:
-            if os.environ.get(env_var, None):
-                del os.environ[env_var]
-        # plugin.load() will force the config to update
-        p.load()
-
-    def test_envvars_values_in_config(self):
-        envvar_to_ini_examples = [
-            ('CKAN__SITE_ID', 'my-envvar-site'),
-            ('CKAN___CKANEXT__EXTENSION_SETTING', 'my-extension-value'),
-            ('CKANEXT__ANOTHER__EXT_SETTING', 'my-other-extension-value'),
-            ('CKAN___BEAKER__SESSION__KEY', 'my-beaker-key'),
-            ('CKAN___CACHE_DIR', '/cache_directory_path/'),
-        ]
-
-        self._setup_env_vars(envvar_to_ini_examples)
-
-        assert config['ckan.site_id'] == 'my-envvar-site'
-        assert config['ckanext.extension_setting'] == 'my-extension-value'
-        assert config['ckanext.another.ext_setting'] == 'my-other-extension-value'
-        assert config['beaker.session.key'] == 'my-beaker-key'
-        assert config['cache_dir'] == '/cache_directory_path/'
-
-        self._teardown_env_vars(envvar_to_ini_examples)
+from unittest import mock
 
 
 class TestCkanCoreEnvVarsConfig(object):
@@ -124,20 +64,14 @@ class TestCkanCoreEnvVarsConfig(object):
         assert config['smtp.password'] == 'password'
         assert config['smtp.mail_from'] == 'server@example.com'
         # I'll expect CKAN 2.10 to transform this to an int
-        if toolkit.check_ckan_version(min_version='2.10'):
-            assert config['ckan.datasets_per_page'] == 14
-        else:
-            assert config['ckan.datasets_per_page'] == '14'
+        assert config['ckan.datasets_per_page'] == 14
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
     @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
-    def test_core_ckan_envvar_values_in_config_take_precedence(self):
+    def test_core_ckan_envvar_values_in_config_take_precedence(self, datastore_configure):
         '''Core CKAN env var transformations take precedence over this
         extension'''
-
-        if not toolkit.check_ckan_version('2.4.0'):
-            raise pytest.skip('CKAN version 2.4 or above needed')
 
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),

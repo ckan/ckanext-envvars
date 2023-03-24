@@ -61,8 +61,16 @@ jobs:
       if: ${{ matrix.ckan-version == '2.7' || matrix.ckan-version == '2.8' }}
       run: |
         paster --plugin=ckan db init -c test.ini
+
     - name: Run tests
-      run: pytest -vv --ckan-ini=test.ini --cov=ckanext.envvars --cov-report=xml --cov-append --disable-warnings ckanext/envvars/tests.py
+      run: |
+        pytest -v --ckan-ini=test.ini \
+           --cov=ckanext.envvars \
+           --cov-report=xml \
+           --cov-append \
+           --disable-warnings \
+           ckanext/envvars/tests/
+
     - name: Upload coverage report to codecov
       uses: codecov/codecov-action@v1
       with:
