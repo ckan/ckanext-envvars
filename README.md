@@ -80,55 +80,41 @@ To run the tests, do:
 
 > pytest --ckan-ini=test.ini ckanext/envvars/tests.py
 
-Registering ckanext-envvars on PyPI
------------------------------------
 
-ckanext-envvars should be availabe on PyPI as
-<https://pypi.python.org/pypi/ckanext-envvars>. If that link doesn\'t
-work, then you can register the project on PyPI for the first time by
-following these steps:
+#### ckanext-envvars on PyPI
 
-1.  Create a source distribution of the project:
+ckanext-envvars is availabe on PyPI as [ckanext-envvars](https://pypi.org/project/ckanext-envvars).  
 
-        python setup.py sdist
+##### Releasing a New Version of ckanext-envvars
 
-2.  Register the project:
 
-        python setup.py register
+To release a new version of this CKAN extension you should:
 
-3.  Upload the source distribution to PyPI:
+ - Update the `setup.py` file with a new version number (N.N.N)
+ - Tag this repo with the new version
 
-        python setup.py sdist upload
+```
+git tag vN.N.N
+git push --tags
+```
 
-4.  Tag the first release of the project on GitHub with the version
-    number from the `setup.py` file. For example if the version number
-    in `setup.py` is 0.0.1 then do:
+ - Create a source distribution of the new version:
 
-        git tag 0.0.1
-        git push --tags
+```
+python setup.py sdist
+```
 
-Releasing a New Version of ckanext-envvars
-------------------------------------------
+ - Set up twine. The `$HOME/.pypirc` file must containg the following:
 
-ckanext-envvars is availabe on PyPI as
-<https://pypi.python.org/pypi/ckanext-envvars>. To publish a new version
-to PyPI follow these steps:
+```
+[pypi]
+username = __token__
+password = <the token value, including the `pypi-` prefix>
+```
 
-1.  Update the version number in the `setup.py` file. See [PEP
-    440](http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers)
-    for how to choose version numbers.
-
-2.  Create a source distribution of the new version:
-
-        python setup.py sdist
-
-3.  Upload the source distribution to PyPI:
-
-        python setup.py sdist upload
-
-4.  Tag the new release of the project on GitHub with the version number
-    from the `setup.py` file. For example if the version number in
-    `setup.py` is 0.0.2 then do:
-
-        git tag 0.0.2
-        git push --tags
+ - Upload the new version to PyPI:
+```
+pip install twine
+twine check dist/*
+twine upload dist/*
+```
