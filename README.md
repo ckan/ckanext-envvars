@@ -90,11 +90,11 @@ ckanext-envvars is availabe on PyPI as [ckanext-envvars](https://pypi.org/projec
 
 To release a new version of this CKAN extension you should:
 
- - Update the `setup.py` file with a new version number (vN.N.N)
+ - Update the `setup.py` file with a new version number (N.N.N)
  - Tag this repo with the new version
 
 ```
-git tag N.N.N
+git tag vN.N.N
 git push --tags
 ```
 
