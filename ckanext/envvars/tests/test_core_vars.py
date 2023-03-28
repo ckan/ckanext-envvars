@@ -1,5 +1,4 @@
 import os
-import pytest
 import ckan.plugins as p
 from ckantoolkit import config
 import ckantoolkit as toolkit
@@ -31,11 +30,10 @@ class TestCkanCoreEnvVarsConfig(object):
         # plugin.load() will force the config to update
         p.load()
 
+    # The datastore plugin, only for CKAN 2.10+, will try to
+    # connect to the database when it is loaded.
     @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
     def test_core_ckan_envvar_values_in_config(self, datastore_configure):
-
-        if not toolkit.check_ckan_version('2.4.0'):
-            raise pytest.skip('CKAN version 2.4 or above needed')
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
@@ -66,8 +64,8 @@ class TestCkanCoreEnvVarsConfig(object):
 
         if toolkit.check_ckan_version(min_version='2.10'):
             assert config['ckan.datasets_per_page'] == 14
-            assert config['ckan.hide_activity_from_users'] == ['user1',  'user2']
-            assert config['smtp.starttls']
+            assert config['ckan.hide_activity_from_users'] == ['user1', 'user2']
+            assert config['smtp.starttls'] is True
         else:
             assert config['ckan.datasets_per_page'] == '14'
             assert config['ckan.hide_activity_from_users'] == 'user1 user2'
