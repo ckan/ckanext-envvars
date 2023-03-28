@@ -41,10 +41,12 @@ class TestCkanCoreEnvVarsConfig(object):
             ('CKAN_DATASTORE_READ_URL', 'postgresql://mynewdbreadurl/'),
             ('CKAN_SITE_ID', 'my-site'),
             ('CKAN_DB', 'postgresql://mydeprectatesqlurl/'),
+            # SMTP settings takes precedence from CKAN core CONFIG_FROM_ENV_VARS
             ('CKAN_SMTP_SERVER', 'mail.example.com'),
             ('CKAN_SMTP_STARTTLS', 'True'),
             ('CKAN_SMTP_USER', 'my_user'),
             ('CKAN_SMTP_PASSWORD', 'password'),
+
             ('CKAN_SMTP_MAIL_FROM', 'server@example.com'),
             ('CKAN__DATASETS_PER_PAGE', '14'),
             ('CKAN__HIDE_ACTIVITY_FROM_USERS', 'user1 user2'),
@@ -61,15 +63,15 @@ class TestCkanCoreEnvVarsConfig(object):
         assert config['smtp.user'] == 'my_user'
         assert config['smtp.password'] == 'password'
         assert config['smtp.mail_from'] == 'server@example.com'
+        # See https://github.com/ckan/ckan/pull/7502
+        assert config['smtp.starttls'] == 'True'
 
         if toolkit.check_ckan_version(min_version='2.10'):
             assert config['ckan.datasets_per_page'] == 14
             assert config['ckan.hide_activity_from_users'] == ['user1', 'user2']
-            assert config['smtp.starttls'] is True
         else:
             assert config['ckan.datasets_per_page'] == '14'
             assert config['ckan.hide_activity_from_users'] == 'user1 user2'
-            assert config['smtp.starttls'] == 'True'
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
