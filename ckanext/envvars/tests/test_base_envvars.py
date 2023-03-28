@@ -1,12 +1,13 @@
 import os
-import pytest
-
 import ckan.plugins as p
-
-from ckantoolkit import config
-import ckantoolkit as toolkit
-
+import ckantoolkit as tk
 from ckanext.envvars.plugin import EnvvarsPlugin
+
+
+if tk.check_ckan_version(min_version='2.10'):
+    from unittest import mock
+else:
+    import mock
 
 
 class TestEnvVarToIni(object):
@@ -59,11 +60,11 @@ class TestEnvVarsConfig(object):
 
         self._setup_env_vars(envvar_to_ini_examples)
 
-        assert config['ckan.site_id'] == 'my-envvar-site'
-        assert config['ckanext.extension_setting'] == 'my-extension-value'
-        assert config['ckanext.another.ext_setting'] == 'my-other-extension-value'
-        assert config['beaker.session.key'] == 'my-beaker-key'
-        assert config['cache_dir'] == '/cache_directory_path/'
+        assert tk.config['ckan.site_id'] == 'my-envvar-site'
+        assert tk.config['ckanext.extension_setting'] == 'my-extension-value'
+        assert tk.config['ckanext.another.ext_setting'] == 'my-other-extension-value'
+        assert tk.config['beaker.session.key'] == 'my-beaker-key'
+        assert tk.config['cache_dir'] == '/cache_directory_path/'
 
         self._teardown_env_vars(envvar_to_ini_examples)
 
@@ -88,44 +89,55 @@ class TestCkanCoreEnvVarsConfig(object):
         # plugin.load() will force the config to update
         p.load()
 
-    def test_core_ckan_envvar_values_in_config(self):
-
-        if not toolkit.check_ckan_version('2.4.0'):
-            raise pytest.skip('CKAN version 2.4 or above needed')
+    # The datastore plugin, only for CKAN 2.10+, will try to
+    # connect to the database when it is loaded.
+    @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
+    def test_core_ckan_envvar_values_in_config(self, datastore_configure):
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
-            ('CKAN_DATASTORE_WRITE_URL', 'http://mynewdbwriteurl/'),
-            ('CKAN_DATASTORE_READ_URL', 'http://mynewdbreadurl/'),
+            ('CKAN_DATASTORE_WRITE_URL', 'postgresql://mynewdbwriteurl/'),
+            ('CKAN_DATASTORE_READ_URL', 'postgresql://mynewdbreadurl/'),
             ('CKAN_SITE_ID', 'my-site'),
             ('CKAN_DB', 'postgresql://mydeprectatesqlurl/'),
+            # SMTP settings takes precedence from CKAN core CONFIG_FROM_ENV_VARS
             ('CKAN_SMTP_SERVER', 'mail.example.com'),
             ('CKAN_SMTP_STARTTLS', 'True'),
             ('CKAN_SMTP_USER', 'my_user'),
             ('CKAN_SMTP_PASSWORD', 'password'),
-            ('CKAN_SMTP_MAIL_FROM', 'server@example.com')
+
+            ('CKAN_SMTP_MAIL_FROM', 'server@example.com'),
+            ('CKAN__DATASETS_PER_PAGE', '14'),
+            ('CKAN__HIDE_ACTIVITY_FROM_USERS', 'user1 user2'),
         ]
 
         self._setup_env_vars(core_ckan_env_var_list)
 
-        assert config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
-        assert config['ckan.datastore.write_url'] == 'http://mynewdbwriteurl/'
-        assert config['ckan.datastore.read_url'] == 'http://mynewdbreadurl/'
-        assert config['ckan.site_id'] == 'my-site'
-        assert config['smtp.server'] == 'mail.example.com'
-        assert config['smtp.starttls'] == 'True'
-        assert config['smtp.user'] == 'my_user'
-        assert config['smtp.password'] == 'password'
-        assert config['smtp.mail_from'] == 'server@example.com'
+        assert tk.config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
+        assert tk.config['ckan.datastore.write_url'] == 'postgresql://mynewdbwriteurl/'
+        assert tk.config['ckan.datastore.read_url'] == 'postgresql://mynewdbreadurl/'
+        assert tk.config['ckan.site_id'] == 'my-site'
+        assert tk.config['smtp.server'] == 'mail.example.com'
+
+        assert tk.config['smtp.user'] == 'my_user'
+        assert tk.config['smtp.password'] == 'password'
+        assert tk.config['smtp.mail_from'] == 'server@example.com'
+        # See https://github.com/ckan/ckan/pull/7502
+        assert tk.config['smtp.starttls'] == 'True'
+
+        if tk.check_ckan_version(min_version='2.10'):
+            assert tk.config['ckan.datasets_per_page'] == 14
+            assert tk.config['ckan.hide_activity_from_users'] == ['user1', 'user2']
+        else:
+            assert tk.config['ckan.datasets_per_page'] == '14'
+            assert tk.config['ckan.hide_activity_from_users'] == 'user1 user2'
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
-    def test_core_ckan_envvar_values_in_config_take_precedence(self):
+    @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
+    def test_core_ckan_envvar_values_in_config_take_precedence(self, datastore_configure):
         '''Core CKAN env var transformations take precedence over this
         extension'''
-
-        if not toolkit.check_ckan_version('2.4.0'):
-            raise pytest.skip('CKAN version 2.4 or above needed')
 
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),
@@ -134,6 +146,6 @@ class TestCkanCoreEnvVarsConfig(object):
 
         self._setup_env_vars(combined_list)
 
-        assert config['sqlalchemy.url'] == 'postgresql://coreckanformat/'
+        assert tk.config['sqlalchemy.url'] == 'postgresql://coreckanformat/'
 
         self._teardown_env_vars(combined_list)
