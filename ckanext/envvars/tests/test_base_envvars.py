@@ -125,22 +125,19 @@ class TestCkanCoreEnvVarsConfig(object):
         assert tk.config['smtp.user'] == 'my_user'
         assert tk.config['smtp.password'] == 'password'
         assert tk.config['smtp.mail_from'] == 'server@example.com'
-        if tk.check_ckan_version(min_version='2.11'):
-            assert tk.config['smtp.starttls'] is True
-        else:
-            assert tk.config['smtp.starttls'] == 'True'
-
 
         if tk.check_ckan_version(min_version='2.10'):
+            assert tk.config['smtp.starttls'] is True
             assert tk.config['ckan.datasets_per_page'] == 14
             assert tk.config['ckan.hide_activity_from_users'] == ['user1', 'user2']
         else:
+            assert tk.config['smtp.starttls'] == 'True'
             assert tk.config['ckan.datasets_per_page'] == '14'
             assert tk.config['ckan.hide_activity_from_users'] == 'user1 user2'
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
-    @pytest.mark.skipif(tk.check_ckan_version(min_version='2.11'), reason="This does not apply to CKAN>=2.11")
+    @pytest.mark.skipif(tk.check_ckan_version(max_version='2.11'), reason="This does not apply to CKAN>=2.11")
     @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
     def test_core_ckan_envvar_values_in_config_take_precedence(self, datastore_configure):
         '''Core CKAN env var transformations take precedence over this
@@ -160,7 +157,7 @@ class TestCkanCoreEnvVarsConfig(object):
 
         self._teardown_env_vars(combined_list)
 
-    @pytest.mark.skipif(tk.check_ckan_version(max_version='2.11'), reason="This does not apply to CKAN<2.11")
+    @pytest.mark.skipif(tk.check_ckan_version(min_version='2.11'), reason="This does not apply to CKAN<2.11")
     @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
     def test_core_ckan_envvar_values_in_config_does_not_take_precedence(self, datastore_configure):
         '''This extension takes precedence over Core CKAN env var transformations in CKAN>=2.11
