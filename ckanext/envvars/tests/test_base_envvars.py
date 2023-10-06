@@ -34,8 +34,24 @@ class TestEnvVarToIni(object):
         ]
 
         for envkey, inikey in envvar_to_ini_examples:
-            assert EnvvarsPlugin._envvar_to_ini(envkey) == inikey
+            assert EnvvarsPlugin()._envvar_to_ini(envkey) == inikey
 
+    @pytest.mark.skipif(tk.check_ckan_version(max_version='2.10'), reason="This does not apply to CKAN<2.10")
+    def test_envvartoini_expected_output_declared_option(self):
+        '''
+        EnvvarsPlugin._envvar_to_ini returns expected transformation of env
+        var formated keys
+        '''
+
+        envvar_to_ini_examples = [
+            ('CKAN___SECRET_KEY', 'SECRET_KEY'),
+            ('CKAN___REMEMBER_COOKIE_DURATION', 'REMEMBER_COOKIE_DURATION'),
+            ('CKAN___WTF_CSRF_ENABLED', 'WTF_CSRF_ENABLED'),
+            ('CKAN___NOT_DECLARED', 'not_declared'),
+        ]
+
+        for envkey, inikey in envvar_to_ini_examples:
+            assert EnvvarsPlugin()._envvar_to_ini(envkey) == inikey
 
 class TestEnvVarsConfig(object):
 
@@ -68,6 +84,25 @@ class TestEnvVarsConfig(object):
         assert tk.config['ckanext.another.ext_setting'] == 'my-other-extension-value'
         assert tk.config['beaker.session.key'] == 'my-beaker-key'
         assert tk.config['cache_dir'] == '/cache_directory_path/'
+
+        self._teardown_env_vars(envvar_to_ini_examples)
+
+    @pytest.mark.skipif(tk.check_ckan_version(max_version='2.10'), reason="This does not apply to CKAN<2.10")
+    def test_envvars_values_in_config(self):
+
+        envvar_to_ini_examples = [
+            ('CKAN___SECRET_KEY', 'super_secret'),
+            ('CKAN___REMEMBER_COOKIE_DURATION', '1000'),
+            ('CKAN___WTF_CSRF_ENABLED', 'True'),
+            ('CKAN___NOT_DECLARED', 'test'),
+        ]
+
+        self._setup_env_vars(envvar_to_ini_examples)
+
+        assert tk.config['SECRET_KEY'] == 'super_secret'
+        assert tk.config['REMEMBER_COOKIE_DURATION'] == 1000
+        assert tk.config['WTF_CSRF_ENABLED'] == True
+        assert tk.config['not_declared'] == 'test'
 
         self._teardown_env_vars(envvar_to_ini_examples)
 
