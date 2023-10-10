@@ -27,6 +27,16 @@ e.g.:
     sqlalchemy.url --> CKAN___SQLALCHEMY__URL
     beaker.session.secret --> CKAN___BEAKER__SESSION__SECRET
 
+
+Starting from CKAN 2.10 (and ckanext-envvars 0.0.4), if a configuration option is defined using CKAN's
+[configuration declaration](https://docs.ckan.org/en/latest/maintaining/configuration.html#config-declaration)
+the key is not further processed. This allows to keep eg upper case setttings like SECRET_KEY, WTF_CSRF_ENABLED, e.g:
+
+    SECRET_KEY --> CKAN___SECRET_KEY
+    WTF_CSRF_ENABLED --> CKAN___WTF_CSRF_ENABLED
+
+
+
 Requirements
 ------------
 
