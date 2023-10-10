@@ -54,6 +54,10 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
 
         if config_declaration:
             self.declared_keys = [str(k) for k in config_declaration.iter_options()]
+            # SECRET_KEY is marked as internal in CKAN 2.10 but we want to
+            # encourage its use so we support it here
+            if "SECRET_KEY" not in self.declared_keys:
+                self.declared_keys.append("SECRET_KEY")
         else:
             self.declared_keys = None
 
