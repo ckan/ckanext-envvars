@@ -53,20 +53,28 @@ class TestEnvVarToIni(object):
         for envkey, inikey in envvar_to_ini_examples:
             assert EnvvarsPlugin()._envvar_to_ini(envkey) == inikey
 
-class TestEnvVarsConfig(object):
+
+class EnvVarsTestBase(object):
 
     def _setup_env_vars(self, envvar_list):
         for env_var, value in envvar_list:
             os.environ[env_var] = value
-        # plugin.load() will force the config to update
-        p.load()
+
+        # Force a config update
+        p.plugins_update()
 
     def _teardown_env_vars(self, envvar_list):
         for env_var, _ in envvar_list:
             if os.environ.get(env_var, None):
                 del os.environ[env_var]
-        # plugin.load() will force the config to update
-        p.load()
+
+        # Force a config update
+        p.plugins_update()
+
+
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.ckan_config("ckan.plugins", "envvars")
+class TestEnvVarsConfig(EnvVarsTestBase):
 
     def test_envvars_values_in_config(self):
         envvar_to_ini_examples = [
@@ -107,25 +115,14 @@ class TestEnvVarsConfig(object):
         self._teardown_env_vars(envvar_to_ini_examples)
 
 
-class TestCkanCoreEnvVarsConfig(object):
+@pytest.mark.usefixtures("with_plugins")
+@pytest.mark.ckan_config("ckan.plugins", "envvars")
+class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
     '''
     Some values are are transformed into ini settings by core CKAN. These
     tests makes sure they still work.
     '''
-
-    def _setup_env_vars(self, envvar_list):
-        for env_var, value in envvar_list:
-            os.environ[env_var] = value
-        # plugin.load() will force the config to update
-        p.load()
-
-    def _teardown_env_vars(self, envvar_list):
-        for env_var, _ in envvar_list:
-            if os.environ.get(env_var, None):
-                del os.environ[env_var]
-        # plugin.load() will force the config to update
-        p.load()
 
     # The datastore plugin, only for CKAN 2.10+, will try to
     # connect to the database when it is loaded.
@@ -211,5 +208,23 @@ class TestCkanCoreEnvVarsConfig(object):
         self._setup_env_vars(combined_list)
 
         assert tk.config['sqlalchemy.url'] == 'postgresql://thisextensionformat/'
+
+        self._teardown_env_vars(combined_list)
+
+    @pytest.mark.skipif(tk.check_ckan_version(max_version='2.11'), reason="This does not apply to CKAN<2.11")
+    def test_plugins_loaded(self):
+        '''
+        New plugins defined in CKAN__PLUGINS are loaded by ckanext-envvars
+        '''
+
+        assert not p.plugin_loaded("image_view")
+
+        combined_list = [
+            ('CKAN__PLUGINS', 'image_view envvars'),
+        ]
+
+        self._setup_env_vars(combined_list)
+
+        assert p.plugin_loaded("image_view")
 
         self._teardown_env_vars(combined_list)

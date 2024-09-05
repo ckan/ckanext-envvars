@@ -51,7 +51,6 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
         # get all vars beginning with 'CKAN'
         ckan_vars = [(k, v) for k, v in os.environ.items() if k.startswith("CKAN")]
 
-
         if config_declaration:
             self.declared_keys = [str(k) for k in config_declaration.iter_options()]
             # SECRET_KEY is marked as internal in CKAN 2.10 but we want to
@@ -70,3 +69,11 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
         # CKAN >=2.10 normalizes config values
         if config_declaration:
             config_declaration.normalize(config)
+
+        # CKAN >= 2.11 needs plugin reloading if ckan.plugins was changed
+        new_plugins = dict(ckan_vars).get("ckan.plugins")
+        if toolkit.check_ckan_version(min_version="2.11") and new_plugins:
+            for plugin in toolkit.aslist(new_plugins):
+                if not plugins.plugin_loaded(plugin):
+                    log.info(f"Loading new plugin: {plugin}")
+                    plugins.load(plugin)
