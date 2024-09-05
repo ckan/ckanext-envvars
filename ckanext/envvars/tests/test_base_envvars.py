@@ -157,7 +157,7 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
         assert tk.config['smtp.user'] == 'my_user'
         assert tk.config['smtp.password'] == 'password'
         assert tk.config['smtp.mail_from'] == 'server@example.com'
-        if tk.check_ckan_version(min_version='2.11'):
+        if tk.check_ckan_version(min_version='2.10'):
             assert tk.config['smtp.starttls'] is True
         else:
             assert tk.config['smtp.starttls'] == 'True'
