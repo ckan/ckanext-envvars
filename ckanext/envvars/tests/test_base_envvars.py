@@ -176,11 +176,11 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
         self._teardown_env_vars(core_ckan_env_var_list)
 
-    @pytest.mark.skipif(tk.check_ckan_version(min_version='2.11'), reason="This does not apply to CKAN>=2.11")
+    @pytest.mark.skipif(tk.check_ckan_version(min_version='2.10'), reason="This does not apply to CKAN>=2.10")
     @mock.patch('ckanext.datastore.plugin.DatastorePlugin.configure')
     def test_core_ckan_envvar_values_in_config_take_precedence(self, datastore_configure):
         '''Core CKAN env var transformations take precedence over this
-        extension in CKAN<2.11
+        extension in CKAN<2.10
 
         See https://github.com/ckan/ckan/pull/7502#issuecomment-1499049307
         '''
