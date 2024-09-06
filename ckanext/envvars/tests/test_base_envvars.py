@@ -13,6 +13,10 @@ else:
     import mock
 
 
+class MockPluginEnvVars(p.SingletonPlugin):
+    pass
+
+
 class TestEnvVarToIni(object):
 
     def test_envvartoini_expected_output(self):
@@ -217,14 +221,14 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
         New plugins defined in CKAN__PLUGINS are loaded by ckanext-envvars
         '''
 
-        assert not p.plugin_loaded("image_view")
+        assert not p.plugin_loaded("mock_envvars_plugin")
 
         combined_list = [
-            ('CKAN__PLUGINS', 'image_view envvars'),
+            ('CKAN__PLUGINS', 'mock_envvars_plugin envvars'),
         ]
 
         self._setup_env_vars(combined_list)
 
-        assert p.plugin_loaded("image_view")
+        assert p.plugin_loaded("mock_envvars_plugin")
 
         self._teardown_env_vars(combined_list)
