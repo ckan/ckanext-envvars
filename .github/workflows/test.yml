@@ -17,7 +17,6 @@ jobs:
     needs: lint
     strategy:
       matrix:
-      matrix:
         include:
           - ckan-version: "master"
             ckan-image: "ckan/ckan-dev:master-py3.10"
