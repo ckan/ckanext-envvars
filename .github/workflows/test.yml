@@ -46,12 +46,8 @@ jobs:
           image: redis:alpine
     env:
       CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
-      CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
-      CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan
       CKAN_REDIS_URL: redis://redis:6379/1
-      # required for CKAN 2.10 (if datastore is enabled)
-      CKAN__DATAPUSHER__API_TOKEN: XX
 
     steps:
     - uses: actions/checkout@v4
@@ -69,6 +65,8 @@ jobs:
         ckan -c test.ini db init
         export CKAN__PLUGINS=envvars
         ckan config-tool /srv/app/src/ckan/test-core.ini "ckan.plugins=envvars"
+        ckan config-tool /srv/app/ckan.ini "ckan.plugins=envvars"
+        echo $CKAN__PLUGINS
     - name: Run tests
       run: |
         pytest -v --ckan-ini=test.ini \
