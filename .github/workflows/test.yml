@@ -67,6 +67,8 @@ jobs:
     - name: Setup extension (CKAN >= 2.9)
       run: |
         ckan -c test.ini db init
+        export CKAN__PLUGINS=envvars
+        ckan config-tool /srv/app/src/ckan/test-core.ini "ckan.plugins=envvars"
     - name: Run tests
       run: |
         pytest -v --ckan-ini=test.ini \
