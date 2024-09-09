@@ -18,6 +18,7 @@ setup(
 
     description='''CKAN configuration settings available from env vars''',
     long_description=long_description,
+    long_description_content_type="text/md",
 
     # The project's main homepage.
     url='https://github.com/okfn/ckanext-envvars',
