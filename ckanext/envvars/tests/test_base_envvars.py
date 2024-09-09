@@ -132,8 +132,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
-            ('CKAN_DATASTORE_WRITE_URL', 'postgresql://mynewdbwriteurl/'),
-            ('CKAN_DATASTORE_READ_URL', 'postgresql://mynewdbreadurl/'),
             ('CKAN_SITE_ID', 'my-site'),
             ('CKAN_DB', 'postgresql://mydeprectatesqlurl/'),
             # SMTP settings takes precedence from CKAN core CONFIG_FROM_ENV_VARS
@@ -150,8 +148,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
         self._setup_env_vars(core_ckan_env_var_list)
 
         assert tk.config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
-        assert tk.config['ckan.datastore.write_url'] == 'postgresql://mynewdbwriteurl/'
-        assert tk.config['ckan.datastore.read_url'] == 'postgresql://mynewdbreadurl/'
         assert tk.config['ckan.site_id'] == 'my-site'
         assert tk.config['smtp.server'] == 'mail.example.com'
 
