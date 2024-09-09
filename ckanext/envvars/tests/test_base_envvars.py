@@ -127,8 +127,8 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
     Some values are are transformed into ini settings by core CKAN. These
     tests makes sure they still work.
     '''
-
-    def test_core_ckan_envvar_values_in_config(self):
+    @mock.patch("ckanext.datastore.plugin.DatastorePlugin.configure")
+    def test_core_ckan_envvar_values_in_config(self, _x):
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
