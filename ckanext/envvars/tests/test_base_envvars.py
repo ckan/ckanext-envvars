@@ -129,11 +129,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
     '''
 
     def test_core_ckan_envvar_values_in_config(self):
-        # The datastore plugin, only for CKAN 2.10+, will try to
-        # connect to the database when it is loaded.
-
-        if p.plugin_loaded("datastore"):
-            p.unload("datastore")
 
         core_ckan_env_var_list = [
             ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
@@ -185,9 +180,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
         See https://github.com/ckan/ckan/pull/7502#issuecomment-1499049307
         '''
-        if p.plugin_loaded("datastore"):
-            p.unload("datastore")
-
 
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),
@@ -206,8 +198,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
         See https://github.com/ckan/ckan/pull/7502#issuecomment-1499049307
         '''
-        if p.plugin_loaded("datastore"):
-            p.unload("datastore")
 
         combined_list = [
             ('CKAN___SQLALCHEMY__URL', 'postgresql://thisextensionformat/'),
