@@ -61,6 +61,9 @@ jobs:
         pip install -r dev-requirements.txt
         # Replace default path to CKAN core config file with the one on the container
         sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
+    - name: Install requirements (CKAN <= 2.9)
+      run: |
+        pip install -U pytest pytest-rerunfailures
     - name: Setup extension (CKAN >= 2.9)
       run: |
         ckan -c test.ini db init
