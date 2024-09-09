@@ -4,7 +4,7 @@ import os
 import ckan.plugins as plugins
 import ckantoolkit as toolkit
 
-if toolkit.check_ckan_version(min_version='2.10'):
+if toolkit.check_ckan_version(min_version="2.10"):
     from ckan.common import config_declaration
 else:
     config_declaration = None
@@ -20,18 +20,18 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
     declared_keys = None
 
     def _envvar_to_ini(self, key):
-        '''Transforms an env var formatted key to ini formatting.'''
+        """Transforms an env var formatted key to ini formatting."""
 
         def _format_key(key):
             # Set it to lowercase
             key = key.lower()
             # Replace dunders with dots
-            key = key.replace('__', '.')
+            key = key.replace("__", ".")
 
             return key
 
         # If the key starts with 'CKAN___' (3 underscores).
-        if key.startswith('CKAN___'):
+        if key.startswith("CKAN___"):
             key = key[7:]
 
         if self.declared_keys:
@@ -49,8 +49,7 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
     def update_config(self, config):
 
         # get all vars beginning with 'CKAN'
-        ckan_vars = ((k, v) for k, v in os.environ.items()
-                     if k.startswith('CKAN'))
+        ckan_vars = [(k, v) for k, v in os.environ.items() if k.startswith("CKAN")]
 
         if config_declaration:
             self.declared_keys = [str(k) for k in config_declaration.iter_options()]
@@ -62,7 +61,7 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
             self.declared_keys = None
 
         # transform vars into ini settings format
-        ckan_vars = ((self._envvar_to_ini(k), v) for k, v in ckan_vars)
+        ckan_vars = [(self._envvar_to_ini(k), v) for k, v in ckan_vars]
 
         # override config settings with new values
         config.update(dict(ckan_vars))
@@ -70,3 +69,11 @@ class EnvvarsPlugin(plugins.SingletonPlugin):
         # CKAN >=2.10 normalizes config values
         if config_declaration:
             config_declaration.normalize(config)
+
+        # CKAN >= 2.11 needs plugin reloading if ckan.plugins was changed
+        new_plugins = dict(ckan_vars).get("ckan.plugins")
+        if toolkit.check_ckan_version(min_version="2.11") and new_plugins:
+            for plugin in toolkit.aslist(new_plugins):
+                if not plugins.plugin_loaded(plugin):
+                    log.info(f"Loading new plugin: {plugin}")
+                    plugins.load(plugin)

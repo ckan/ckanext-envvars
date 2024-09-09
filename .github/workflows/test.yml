@@ -4,10 +4,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install requirements
         run: pip install flake8 pycodestyle
       - name: Check syntax
@@ -17,16 +17,24 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        ckan-version: [master, "2.10", 2.9, 2.9-py2, 2.8, 2.7]
+        include:
+          - ckan-version: "master"
+            ckan-image: "ckan/ckan-dev:master-py3.10"
+          - ckan-version: "2.11"
+            ckan-image: "ckan/ckan-dev:2.11-py3.10"
+          - ckan-version: "2.10"
+            ckan-image: "ckan/ckan-dev:2.10-py3.10"
+          - ckan-version: "2.9"
+            ckan-image: "ckan/ckan-dev:2.9-py3.9"
       fail-fast: false
 
     name: CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
     container:
-      image: openknowledge/ckan-dev:${{ matrix.ckan-version }}
+      image: ${{ matrix.ckan-image }}
     services:
       solr:
-        image: datagov/catalog.data.gov.solr:latest
+        image: ckan/ckan-solr:${{ matrix.ckan-version }}-solr9
       postgres:
         image: ckan/ckan-postgres-dev:${{ matrix.ckan-version }}
         env:
@@ -42,26 +50,25 @@ jobs:
       CKAN_DATASTORE_READ_URL: postgresql://datastore_read:pass@postgres/datastore_test
       CKAN_SOLR_URL: http://solr:8983/solr/ckan
       CKAN_REDIS_URL: redis://redis:6379/1
-      # required for CKAN 2.10 (if datastore is enabled)
-      CKAN__DATAPUSHER__API_TOKEN: XX
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install requirements (common)
       run: |
         pip install -e .
         pip install -r dev-requirements.txt
         # Replace default path to CKAN core config file with the one on the container
         sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
+    - name: Install requirements (CKAN <= 2.9)
+      run: |
+        pip install -U pytest pytest-rerunfailures
     - name: Setup extension (CKAN >= 2.9)
-      if: ${{ matrix.ckan-version != '2.7' && matrix.ckan-version != '2.8' }}
       run: |
         ckan -c test.ini db init
-    - name: Setup extension (CKAN < 2.9)
-      if: ${{ matrix.ckan-version == '2.7' || matrix.ckan-version == '2.8' }}
-      run: |
-        paster --plugin=ckan db init -c test.ini
-
+        export CKAN__PLUGINS=envvars
+        ckan config-tool /srv/app/src/ckan/test-core.ini "ckan.plugins=envvars"
+        ckan config-tool /srv/app/ckan.ini "ckan.plugins=envvars"
+        echo $CKAN__PLUGINS
     - name: Run tests
       run: |
         pytest -v --ckan-ini=test.ini \
@@ -70,8 +77,3 @@ jobs:
            --cov-append \
            --disable-warnings \
            ckanext/envvars/tests/
-
-    - name: Upload coverage report to codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml

@@ -81,5 +81,6 @@ setup(
     entry_points='''
         [ckan.plugins]
         envvars=ckanext.envvars.plugin:EnvvarsPlugin
+        mock_envvars_plugin=ckanext.envvars.tests.test_base_envvars:MockPluginEnvVars
     ''',
 )
