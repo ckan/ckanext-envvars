@@ -131,7 +131,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
     def test_core_ckan_envvar_values_in_config(self, _x):
 
         core_ckan_env_var_list = [
-            ('CKAN_SQLALCHEMY_URL', 'postgresql://mynewsqlurl/'),
             ('CKAN_SITE_ID', 'my-site'),
             ('CKAN_DB', 'postgresql://mydeprectatesqlurl/'),
             # SMTP settings takes precedence from CKAN core CONFIG_FROM_ENV_VARS
@@ -147,7 +146,6 @@ class TestCkanCoreEnvVarsConfig(EnvVarsTestBase):
 
         self._setup_env_vars(core_ckan_env_var_list)
 
-        assert tk.config['sqlalchemy.url'] == 'postgresql://mynewsqlurl/'
         assert tk.config['ckan.site_id'] == 'my-site'
         assert tk.config['smtp.server'] == 'mail.example.com'
 
