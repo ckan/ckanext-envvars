@@ -14,11 +14,11 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='0.0.5',
+    version='0.0.6',
 
     description='''CKAN configuration settings available from env vars''',
     long_description=long_description,
-    long_description_content_type="text/md",
+    long_description_content_type="text/markdown",
 
     # The project's main homepage.
     url='https://github.com/okfn/ckanext-envvars',
