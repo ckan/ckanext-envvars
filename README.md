@@ -14,19 +14,13 @@ the following way:
 1)  All uppercase
 2)  Replace periods (\'.\') with two underscores (\'\_\_\')
 3)  Keys must begin with \'CKAN\' or \'CKANEXT\'
+4)  Keys that do not begin with \'CKAN\', add \'CKAN\_\_\_\' (3 underscores) at the beginning.
 
 Some examples:
 
     ckan.site_id --> CKAN__SITE_ID
     ckanext.s3filestore.aws_bucket_name --> CKANEXT__S3FILESTORE__AWS_BUCKET_NAME
-
-For keys that don\'t normally begin with \'CKAN\', add \'CKAN\_\_\_\' (3
-underscores) to the beginning to help the extension identify these keys,
-e.g.:
-
-    sqlalchemy.url --> CKAN___SQLALCHEMY__URL
     beaker.session.secret --> CKAN___BEAKER__SESSION__SECRET
-
 
 Starting from CKAN 2.10 (and ckanext-envvars 0.0.4), if a configuration option is defined using CKAN's
 [configuration declaration](https://docs.ckan.org/en/latest/maintaining/configuration.html#config-declaration)
@@ -35,6 +29,13 @@ the key is not further processed. This allows to keep eg upper case setttings li
     SECRET_KEY --> CKAN___SECRET_KEY
     WTF_CSRF_ENABLED --> CKAN___WTF_CSRF_ENABLED
 
+
+Important note
+--------------
+
+CKAN requires a proper connection to a database to initialize and load plugins,
+therefore `ckanext-envvars` cannot be used to set `sqlalchemy.url`.
+Also, plugins are first loaded from the `ckan.ini` file so setting `CKAN__PLUGINS` will not have the desire effect.
 
 
 Requirements
@@ -93,7 +94,7 @@ To run the tests, do:
 
 #### ckanext-envvars on PyPI
 
-ckanext-envvars is availabe on PyPI as [ckanext-envvars](https://pypi.org/project/ckanext-envvars).  
+ckanext-envvars is availabe on PyPI as [ckanext-envvars](https://pypi.org/project/ckanext-envvars).
 
 ##### Releasing a New Version of ckanext-envvars
 
