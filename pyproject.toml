@@ -1,0 +1,47 @@
+
+[project]
+name = "ckanext-envvars"
+version = "0.0.6"
+description = "CKAN configuration settings available from env vars"
+readme = "README.md"
+authors = [
+    {name = "Brook Elgie", email = "brook.elgie@okfn.org"}
+]
+license = {text = "AGPL"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3",
+
+]
+keywords = []
+dependencies = [
+    "ckantoolkit"
+]
+
+[project.urls]
+Homepage = "http://github.com/ckan/ckanext-envvars"
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+#[build-system]
+#requires = ["setuptools", "wheel"]
+#build-backend = "setuptools.build_meta"
+#
+[tool.setuptools]
+#packages = ["ckanext"]
+#namespace-packages = ["ckanext"]
+include-package-data = true
+
+[tool.setuptools.packages]
+find = {}
+
+
+[project.entry-points."ckan.plugins"]
+envvars = "ckanext.envvars.plugin:EnvvarsPlugin"
+mock_envvars_plugin = "ckanext.envvars.tests.test_base_envvars:MockPluginEnvVars"
